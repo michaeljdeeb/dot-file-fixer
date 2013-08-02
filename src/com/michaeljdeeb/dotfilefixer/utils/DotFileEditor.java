@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
  */
 public class DotFileEditor {
 	// Path to the folder containing the .dot files.
-	public static final String PATH_TO_DOTS = "./resources/";
+	public static final String PATH_TO_DOT_FILES = "./resources/";
 
 	// Change this to the font you would like to use instead (if applicable).
 	public static final String NEW_FONT = "HelveticaNeue-Light";
@@ -34,9 +34,12 @@ public class DotFileEditor {
 
 	// Change these HTML colors to the background colors you would like to search for instead or add more.
 	public static final String[] PROBLEMATIC_BACKGROUND_COLORS = {"#1b263f", "#27375f"};
-
+	
 	// Change this HTML color to be the font color you would like to use on the problematic backgrounds.
 	public static final String NEW_COLOR = "#FFFFFF";
+	
+	// Change this path if not using OS X or if you have a non-standard install of dot.
+	public static final String PATH_TO_DOT = "/usr/local/bin/dot";
 	
 	// Settings
 	public static final boolean CHANGE_FONT = true;
@@ -62,7 +65,7 @@ public class DotFileEditor {
 	 */
 	public static void main(String[] args) throws IOException {
 
-		for(File file: getDotFiles(PATH_TO_DOTS)) {
+		for(File file: getDotFiles(PATH_TO_DOT_FILES)) {
 			FileInputStream fstream = new FileInputStream(file);
 			BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
 			String strLine;
@@ -114,8 +117,15 @@ public class DotFileEditor {
         	
         	/* If using Linux or Windows you might be able to use a Graphviz Java API
         	 * http://www.loria.fr/~szathmar/off/projects/java/GraphVizAPI/index.php
-        	 * to generate the new PNGs for SchemaSpy to use, but I had to write a shell script for OS X.
+        	 * to generate the new PNGs for SchemaSpy to use, but I run a Terminal command below on OS X.
         	*/
+        	
+        	// Generate the new image.
+        	String imageFilePath = file.getCanonicalFile().toString();
+        	if (imageFilePath.indexOf(".") > 0)
+        		imageFilePath = imageFilePath.substring(0, imageFilePath.lastIndexOf("."));
+        	String command = PATH_TO_DOT+" -Tpng "+file.getCanonicalFile()+" -o "+imageFilePath+".png";
+        	Runtime.getRuntime().exec(command);
 
 		}
 	}
